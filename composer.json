@@ -1,0 +1,5 @@
+{
+    "require": {
+        "laravel-notification-channels/fcm": "~2.0"
+    }
+}

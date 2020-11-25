@@ -5,7 +5,7 @@ import 'package:foodexpress/config/api.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:foodexpress/src/widget/notification_text.dart';
+import 'package:foodexpress/src/Widget/notification_text.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 

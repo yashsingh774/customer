@@ -10,6 +10,7 @@ import 'package:foodexpress/src/screens/Help.dart';
 import 'package:foodexpress/src/screens/ProfilePage.dart';
 import 'package:foodexpress/src/screens/Transaction.dart';
 import 'package:foodexpress/src/screens/cartpage.dart';
+import 'package:foodexpress/src/screens/cat.dart';
 import 'package:foodexpress/src/screens/loginPage.dart';
 import 'package:foodexpress/src/screens/orderhistory.dart';
 import 'package:foodexpress/src/screens/signupPage.dart';
@@ -142,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
       CartPage(),
       LoginPage(),
       HelpPage(),
+      SampleApp(),
       // ShopPage(),
       // GooutPage(),
     ];

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:foodexpress/models/cartmodel.dart';
 import 'package:foodexpress/providers/auth.dart';
 import 'package:foodexpress/src/Widget/PaymentMethodListItemWidget.dart';
-import 'package:foodexpress/src/screens/paymentPaystack.dart';
 import 'package:foodexpress/src/screens/paymentPaytm.dart';
 import 'package:foodexpress/src/screens/paymentRazorpay.dart';
 import 'package:foodexpress/src/screens/paymentStripe.dart';
 import 'package:foodexpress/src/utils/CustomTextStyle.dart';
 import 'package:provider/provider.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import '../../main.dart';
 
@@ -27,13 +28,53 @@ class _PaymentMethodsWidgetState extends State<PaymentMethodsPage> {
     super.initState();
   }
 
+
+Future<bool> _onBackPressed() {
+    return showDialog(
+          context: context,
+          barrierDismissible: false, // user must tap button for close dialog!
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Are you sure?'),
+              content: const Text(
+                  'If you click back, Your Order will be Deleted'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text('CANCEL'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+                FlatButton(
+                  child: const Text('ACCEPT'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    ScopedModel.of<CartModel>(context, rebuildOnChange: true)
+                        .clearCart();
+  Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => MyHomePage(tabsIndex: 0),
+              ));
+                  },
+                )
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     final token = Provider.of<AuthProvider>(context, listen: true).token;
     final currencyName = Provider.of<AuthProvider>(context, listen: true).currencyname;
     final stripeKey = Provider.of<AuthProvider>(context, listen: true).stripekey;
     final stripeSecret = Provider.of<AuthProvider>(context, listen: true).stripesecret;
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xff44c662),
         elevation: 0,
@@ -76,10 +117,16 @@ class _PaymentMethodsWidgetState extends State<PaymentMethodsPage> {
               children: <Widget>[
                 // PaymentMethodListItemWidget(paymentMethod:'Stripe',logo: 'assets/images/stripe.png',description:'Click to pay with your Stripe' ,route: PaymentStripeMethodsPage(amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
                 // SizedBox(height: 10),
-                 PaymentMethodListItemWidget(paymentMethod:'Razorpay',logo: 'assets/images/razorpay.png',description:'Click to pay with your Razorpay' ,route: PaymentRazorPay(amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
-                 SizedBox(height: 10),
-                //   PaymentMethodListItemWidget(paymentMethod:'Paytm',logo: 'assets/images/razorpay.png',description:'Click to pay with your Paytm' ,route: PaymentPaytm(),),
-                //  SizedBox(height: 10),
+                PaymentMethodListItemWidget(paymentMethod:'Razorpay',logo: 'assets/images/razorpay.png',description:'Click to pay with your Razorpay' ,route: PaymentRazorPay(amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
+                SizedBox(height: 10),
+                // PaymentMethodListItemWidget(paymentMethod:'Paytm',logo: 'assets/images/razorpay.png',description:'Click to pay with your Paytm' ,route: PaymentPaytm(
+                //   amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
+
+                //                 PaymentMethodListItemWidget(paymentMethod:'Paytm',logo: 'assets/images/razorpay.png',description:'Click to pay with your Paytm' ,route: PaymentPaytm(amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
+                // SizedBox(height: 10),
+
+                PaymentMethodListItemWidget(paymentMethod:'Paytm',logo: 'assets/images/paytm.jpg',description:'Click to pay with your Paytm' ,route: PaymentPaytm(amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
+                SizedBox(height: 10),
                 // PaymentMethodListItemWidget(paymentMethod:'Paystack',logo: 'assets/images/paystack.png',description:'Click to pay with your Paystack' ,route: PaymentPaystack(amount:widget.amount,OrderID:widget.orderID,customerToken: token,),),
               ],
             ),
@@ -108,14 +155,14 @@ class _PaymentMethodsWidgetState extends State<PaymentMethodsPage> {
               scrollDirection: Axis.vertical,
               primary: false,
               children: <Widget>[
-                PaymentMethodListItemWidget(paymentMethod:'Cash on Delivery',logo: 'assets/images/cash_delivery.jpg',description:'Click to pay cash on delivery' ,route: MyHomePage(title:'My Order',tabsIndex: 1,),),
+                PaymentMethodListItemWidget(paymentMethod:'Cash on Delivery',logo: 'assets/images/cash_delivery.jpg',description:'Click to pay cash on delivery' ,route: MyHomePage(title:'My Order',tabsIndex: 3,),),
                 SizedBox(height: 10),
-      //          PaymentMethodListItemWidget(paymentMethod:'Pay on Pickup',logo: 'assets/images/pay_pickup.png',description:'Click to pay on pickup' ,route:MyHomePage(title:'My Order',tabsIndex: 1,),),
+                PaymentMethodListItemWidget(paymentMethod:'Pay on Pickup',logo: 'assets/images/pay_pickup.png',description:'Click to pay on pickup' ,route:MyHomePage(title:'My Order',tabsIndex: 3,),),
               ],
             ),
           ],
         ),
       ),
-    );
+    ));
   }
 }

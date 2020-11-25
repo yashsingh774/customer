@@ -85,7 +85,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
         _OrderSucess = resBody['message'];
         _OrderId = resBody['data']['id'].toString();
         _OrderAmount = resBody['data']['total'].toString();
-        showThankYouBottomSheet(context,resBody['message'],resBody['data']['id'].toString(),resBody['data']['total'].toString());
+ //       showThankYouBottomSheet(context,resBody['message'],resBody['data']['id'].toString(),resBody['data']['total'].toString());
+     Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) => PaymentMethodsPage(amount: _OrderAmount,orderID: _OrderId,)));
         ScopedModel.of<CartModel>(context, rebuildOnChange: true).clearCart();
       });
     } else {
@@ -247,7 +249,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             }
                             if(_OrderSucess != null){
                               ScopedModel.of<CartModel>(context, rebuildOnChange: true).clearCart();
-                              showThankYouBottomSheet(context,_OrderSucess,_OrderId,_OrderAmount);
+                              //showThankYouBottomSheet(context,_OrderSucess,_OrderId,_OrderAmount);
+                                      Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) => PaymentMethodsPage(amount: _OrderAmount,orderID: _OrderId,)));
                             }
                           }
                     },

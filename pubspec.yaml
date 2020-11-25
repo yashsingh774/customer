@@ -66,6 +66,7 @@ dependencies:
   rounded_loading_button: ^1.0.0
   flutter_slidable: ^0.5.7
   loading: ^1.0.2
+  timer_builder: ^1.3.0
 
 dev_dependencies:
   flutter_test:
@@ -122,6 +123,7 @@ flutter:
     - assets/images/food_ic_walk1.svg
     - assets/images/food_ic_walk2.svg
     - assets/images/food_ic_walk3.svg
+    - assets/images/paytm.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

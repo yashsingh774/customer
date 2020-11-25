@@ -434,6 +434,7 @@ class _AppDrawerState extends State<AppDrawer> {
               style: Theme.of(context).textTheme.subtitle1,
             ),
           ),
+          
           // ListTile(
           //   onTap: () {
           //     if (currentUser.value.apiToken != null) {

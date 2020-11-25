@@ -51,7 +51,7 @@ class _PaymentRazorPay extends State<PaymentRazorPay> {
 
   void openCheckout(){
     var options = {
-      "key" : 'rzp_live_PcGfyx3dtAZBaq',
+      "key" : 'rzp_test_uFzUdXGdjklD2Y',
       "amount" : num.parse(widget.amount)*100,
       "name" : sitename,
       "description" : 'Order ID '+ widget.OrderID.toString(),

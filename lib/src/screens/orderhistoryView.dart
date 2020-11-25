@@ -223,12 +223,12 @@ class _OrderHistoryViewPageState extends State<OrderViewPage> {
                       Padding(
                           padding: EdgeInsets.fromLTRB(15, 4, 4, 8),
                           child:Text(
-                             orderView['payment_status'] == '5' ? 'Paid':'Unpaid',
+                             orderView['payment_status'] != '10' ? 'Paid':'Unpaid',
                             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                           )
                       ),
                       SizedBox(height: 20),
-                      // Theme(
+                      // Theme(+
                       //   data: ThemeData(
                       //     primaryColor: Theme.of(context).accentColor,
                       //   ),

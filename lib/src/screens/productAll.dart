@@ -188,25 +188,25 @@ _buildFoodCard(context,currency,Product food, onTapped) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Container(
-                    child: ClipRRect(
+                  Container(  
+                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(5.0),
                       child: Image.network(
                         food.imgUrl,
-                        fit: BoxFit.cover,
-                        height: 100,
+                        fit: BoxFit.fill,
+                        height: 120,
                         width: double.infinity,
 
                       ),
 
                     ),
                   ),
-                  SizedBox(height: 7),
+                  SizedBox(height: 3),
                   Text(
                     food.name != null ? food.name : '',
                     style:  TextStyle(
                         fontFamily: 'Montserrat',
-                        color: Color(0xFF440206),
+                        color: Colors.black,
                         fontSize: 15.0),
                     softWrap: false,
                     maxLines: 1,
@@ -217,7 +217,7 @@ _buildFoodCard(context,currency,Product food, onTapped) {
                     '$currency' + food.price.toString(),
                     style:  TextStyle(
                         fontFamily: 'Montserrat',
-                        color: Color(0xFFF75A4C),
+                        color: Colors.black,
                         fontSize: 14.0),
                     softWrap: false,
                     maxLines: 1,

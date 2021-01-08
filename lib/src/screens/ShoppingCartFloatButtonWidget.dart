@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:foodexpress/main.dart';
+import 'package:foodexpress/models/cartmodel.dart';
+import 'package:foodexpress/providers/auth.dart';
+import 'package:foodexpress/src/screens/loginPage.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
+import 'package:provider/provider.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class ShoppingCartFloatButtonWidget extends StatefulWidget {
   const ShoppingCartFloatButtonWidget({
@@ -27,6 +33,7 @@ class _ShoppingCartFloatButtonWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final authenticated = Provider.of<AuthProvider>(context).status;
     return SizedBox(
       width: 60,
       height: 60,
@@ -35,22 +42,26 @@ class _ShoppingCartFloatButtonWidgetState
         color: Colors.green,
         shape: StadiumBorder(),
         onPressed: () {
-          // if (currentUser.value.apiToken != null) {
-          //   Navigator.of(context).pushNamed('/Cart', arguments: widget.routeArgument);
-          // } else {
-          //   Navigator.of(context).pushNamed('/Login');
-          // }
+          Navigator.of(context).pop();
+          if (authenticated == Status.Authenticated) {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) =>
+                    MyHomePage(title: 'My Cart', tabsIndex: 4)));
+          } else {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => LoginPage()));
+          }
         },
         child: Stack(
           alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
             Icon(
               Icons.shopping_cart,
-              color: this.widget.iconColor,
-              size: 32,
+              color: Colors.white,
+              size: 30,
             ),
             Container(
-              child: Text('1',
+              child: Text( ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalQunty.toString(),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,

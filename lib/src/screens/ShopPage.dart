@@ -8,12 +8,15 @@ import 'package:foodexpress/src/utils/CustomTextStyle.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:progressive_image/progressive_image.dart';
 
 void main() => runApp(MyApp());
+
 class MyApp extends StatelessWidget {
   final AuthProvider _auth = AuthProvider();
   @override
@@ -32,6 +35,7 @@ class MyApp extends StatelessWidget {
             )));
   }
 }
+
 class ShopPage extends StatefulWidget {
   @override
   _ShopPageState createState() {
@@ -91,8 +95,8 @@ class _ShopPageState extends State<ShopPage> {
     }
     return "Sucess";
   }
-  
-    Future<String> getBanners() async {
+
+  Future<String> getBanners() async {
     final url = "$api/banners";
     var response = await http.get(url, headers: {"Accept": "application/json"});
     var resBody = json.decode(response.body);
@@ -189,6 +193,7 @@ class _ShopPageState extends State<ShopPage> {
     }
     return "Sucess";
   }
+
   void SerchShop(value, latitude, longitude) async {
     final url = "$api/search/$value/shops";
     var response = await http.get(url, headers: {
@@ -231,13 +236,12 @@ class _ShopPageState extends State<ShopPage> {
   void initState() {
     getSections();
     getBanners();
-        Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 4), () {
       setState(() {
         buildBannerCard = true;
         buildSectionCard = true;
       });
-    }
-    );
+    });
     super.initState();
     _getCurrentLocation();
     checkPermission();
@@ -259,7 +263,6 @@ class _ShopPageState extends State<ShopPage> {
       print(e);
     }
   }
-
 
   _getCurrentLocation() {
     geolocator
@@ -305,7 +308,7 @@ class _ShopPageState extends State<ShopPage> {
     //  padding: EdgeInsets.only( left: 5.0, right: 5.0),
     //   height: 150.0,
     //   child: new Carousel(
-        
+
     //     boxFit: BoxFit.cover,
     //     images: [
     //       AssetImage('assets/images/1.jpg'),
@@ -324,175 +327,158 @@ class _ShopPageState extends State<ShopPage> {
             child: RefreshIndicator(
                 key: refreshKey,
                 onRefresh: () async {
-                  await refreshList(_selectedArea); 
+                  await refreshList(_selectedArea);
                 },
                 child: new LayoutBuilder(builder:
                     (BuildContext context, BoxConstraints constraints) {
-                   return SingleChildScrollView(
-
-              child: Column(
-                
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Container(
-                                 padding: EdgeInsets.only( left: 2.0, right: 2.0),
-
-                              child: Container(  
-                                
+                  return SingleChildScrollView(
+                      child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.only(left: 2.0, right: 2.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Colors.grey.shade300, width: 1),
+                              color: Colors.white70,
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(20.0),
+                                bottomLeft: Radius.circular(20.0),
+                                topLeft: Radius.circular(20.0),
+                                topRight: Radius.circular(20.0),
+                              )),
+                          child: TextField(
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (value) {
+                              SerchShop(
+                                  value != null ? value : null,
+                                  _currentPosition != null
+                                      ? _currentPosition.latitude
+                                      : '',
+                                  _currentPosition != null
+                                      ? _currentPosition.longitude
+                                      : '');
+                            },
+                            controller: editingController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(top: 14.0),
+                              hintText: 'Search for shops',
+                              hintStyle: TextStyle(
+                                  fontFamily: 'Montserrat', fontSize: 14.0),
+                              prefixIcon:
+                                  Icon(Icons.search, color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ),
+                      buildBannerCard
+                          ? Container(
+                              padding: EdgeInsets.only(
+                                  top: 2.0, left: 2.0, right: 2.0),
+                              child: Container(
                                 decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade300, width: 1),
                                     color: Colors.white70,
                                     borderRadius: BorderRadius.only(
                                       bottomRight: Radius.circular(20.0),
                                       bottomLeft: Radius.circular(20.0),
                                       topLeft: Radius.circular(20.0),
                                       topRight: Radius.circular(20.0),
-                                   )
-                                    ),
-                                child: TextField(
-                                  textInputAction: TextInputAction.search,
-                                  onSubmitted: (value) {
-                                    
-                                    SerchShop(
-                                        value != null ? value : null,
-                                        _currentPosition != null
-                                            ? _currentPosition.latitude
-                                            : '',
-                                        _currentPosition != null
-                                            ? _currentPosition.longitude
-                                            : '');
-                                  },
-                                  controller: editingController,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(top: 14.0),
-                                    hintText: 'Search for shops',
-                                    hintStyle: TextStyle(
-                                        fontFamily: 'Montserrat',
-                                        fontSize: 14.0),
-                                    prefixIcon:
-                                        Icon(Icons.search, color: Colors.grey),
-                                  ),
+                                    )),
+                              ),
+                            )
+                          : SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: 220,
+                              child: Shimmer.fromColors(
+                                child: Card(
+                                  color: Colors.grey,
                                 ),
+                                baseColor: Colors.white70,
+                                highlightColor: Colors.grey[500],
+                                direction: ShimmerDirection.ltr,
                               ),
                             ),
-                  buildBannerCard
-                  ?
-                    Container(
-                                 padding: EdgeInsets.only(top:2.0,left: 2.0, right: 2.0),
-                              child: Container(  
-                                decoration: BoxDecoration(
-
-                                    color: Colors.white70,
-                                    borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(20.0),
-                                      bottomLeft: Radius.circular(20.0),
-                                      topLeft: Radius.circular(20.0),
-                                      topRight: Radius.circular(20.0),
-                                   )
-                                    ),
-                              
-                              ),
-                            ):
-                                SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 220,
-                    child: Shimmer.fromColors(
-                      child: Card(
-                        color: Colors.grey,
+                      Container(
+                        height: 220,
+                        padding:
+                            EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: _banners.map((banner) {
+                              return _buildBannerCard(banner['name'],
+                                  banner['image'], banner['id']);
+                            }).toList(),
+                          ),
+                        ),
                       ),
-                      
-                      baseColor: Colors.white70,
-                      highlightColor: Colors.grey[500],
-                      direction: ShimmerDirection.ltr,
-                    ),
-),
-     Container(
-                              height: 220,
-                              padding: EdgeInsets.only(top:10.0,left: 10.0, right: 10.0),
-                               child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                              child: ListView(
-                                
-                                scrollDirection: Axis.horizontal,
-                                children: _banners.map((banner) {
-                                  
-                                  return _buildBannerCard(banner['name'],
-                                      banner['image'], banner['id']);
-                                }).toList(),
-                              ),
-                               ),
-                                   ),
-                              
-             SizedBox(
-              // height: 150.0,
-              // width: 300.0,
-               child: Padding(
-              padding: EdgeInsets.only(left: 15.0, right: 15.0),
-             
-              child: Row(
-            children: <Widget>[
-
-              Icon(
-                Icons.star,
-                color: Colors.black,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                'Shop Categories',
-                style: CustomTextStyle.textFormFieldBold
-                    .copyWith(color: Colors.black),
-              ),
-            ],
-          ),                 
-               )),
-                           buildSectionCard
-              ?
-                          Container(
+                      SizedBox(
+                          // height: 150.0,
+                          // width: 300.0,
+                          child: Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.star,
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              'Shop Categories',
+                              style: CustomTextStyle.textFormFieldBold
+                                  .copyWith(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      )),
+                      buildSectionCard
+                          ? Container(
                               height: 140,
-                              padding: EdgeInsets.only(top:10.0,left: 10.0, right: 10.0),
+                              padding: EdgeInsets.only(
+                                  top: 10.0, left: 10.0, right: 10.0),
                               child: ListView(
-                                
                                 scrollDirection: Axis.horizontal,
                                 children: _sections.map((section) {
                                   return _buildSectionCard(section['name'],
                                       section['image'], section['id']);
                                 }).toList(),
                               ),
-                            ):
-                                   SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 140,
-                    child: Shimmer.fromColors(
-                      child: Card(
-                        color: Colors.grey,
-                      ),
-                      
-                      baseColor: Colors.white70,
-                      highlightColor: Colors.grey[500],
-                      direction: ShimmerDirection.ltr,
-                    ),
-),
-                           Container(
-                              padding: EdgeInsets.only(top:20.0,left: 10.0, right: 20.0),
-                              height: 400,
-                                child: new GridView.count(
-                                crossAxisCount: 3,
-                                shrinkWrap: false,
-                                primary: false,
-                                scrollDirection: Axis.vertical,
-                                children: _shops.map((shop) {
-                                  return _buildCard(shop['name'],shop['image'],shop['address'],shop['id']);
-                                 }).toList(),
-                              )
-                          ),
-                          
+                            )
+                          : SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: 140,
+                              child: Shimmer.fromColors(
+                                child: Card(
+                                  color: Colors.grey,
+                                ),
+                                baseColor: Colors.white70,
+                                highlightColor: Colors.grey[500],
+                                direction: ShimmerDirection.ltr,
+                              ),
+                            ),
+                      Container(
+                          padding: EdgeInsets.only(
+                              top: 20.0, left: 10.0, right: 20.0),
+                          height: 800,
+                          child: new GridView.count(
+                            crossAxisCount: 3,
+                            shrinkWrap: false,
+                            primary: false,
+                            scrollDirection: Axis.vertical,
+                            children: _shops.map((shop) {
+                              return _buildCard(shop['name'], shop['image'],
+                                  shop['address'], shop['id']);
+                            }).toList(),
+                          )),
                     ],
-                  )
-                   );
+                  ));
                 }))));
   }
 
@@ -505,37 +491,45 @@ class _ShopPageState extends State<ShopPage> {
             '$sectionpID',
             _currentPosition != null ? _currentPosition.latitude : '',
             _currentPosition != null ? _currentPosition.longitude : '');
-      
       },
       child: Container(
         margin: EdgeInsets.all(5),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-         color: Colors.white,
-                   border: Border.all(color: Colors.grey.shade300, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(15)),
-              ),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300, width: 2),
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
         child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Container(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(80),
-                child: Image.network(
-                  imgPath,
+                // child: Image.network(
+                //   imgPath,
+                //   fit: BoxFit.contain,
+                //   height: 50,
+                //   width: 90,
+                // ),
+                child: ProgressiveImage(
+                  //imgPath,
+                  placeholder: AssetImage('assets/placeholder.jpg'),
+                  // size: 1.87KB
+                  thumbnail: NetworkImage(imgPath),
+                  // size: 1.29MB
+                  image: NetworkImage(imgPath),
                   fit: BoxFit.contain,
                   height: 50,
                   width: 90,
                 ),
               ),
             ),
-          Text(
+            Text(
               name != null ? name : '',
               style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Varela',
-                  fontSize: 15.0),
+                  color: Colors.black, fontFamily: 'Varela', fontSize: 15.0),
               softWrap: false,
               maxLines: 3,
               overflow: TextOverflow.fade,
@@ -548,46 +542,59 @@ class _ShopPageState extends State<ShopPage> {
     );
   }
 
-    Widget _buildCard(String name, String imgPath, String address, int shopID) {
+  Widget _buildCard(String name, String imgPath, String address, int shopID) {
     return InkWell(
       highlightColor: Colors.grey,
       splashColor: Colors.grey,
-       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(    
-          builder: (context) => Category(shopID: '$shopID', shopName: name),
-        ));
+      onTap: () {
+        // Navigator.of(context).push(MaterialPageRoute(
+        //   builder: (context) => Category(shopID: '$shopID', shopName: name),
+        // ));
+        Navigator.push(
+            context,
+            PageTransition(
+                type: PageTransitionType.rightToLeft,
+                child: Category(shopID: '$shopID', shopName: name)));
       },
       child: Container(
-        
         margin: EdgeInsets.all(5),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-           
-            color: Colors.white,
-                   border: Border.all(color: Colors.grey.shade300, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(15)),
-              ),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300, width: 2),
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
         child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Container(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(1),
-                child: Image.network(
-                  imgPath,
+                // child: Image.network(
+                //   imgPath,
+                //   fit: BoxFit.contain,
+                //   height: 60,
+                //   width: 80,
+                // ),
+
+                child: ProgressiveImage(
+                  //imgPath,
+                  placeholder: AssetImage('assets/placeholder.jpg'),
+                  // size: 1.87KB
+                  thumbnail: NetworkImage(imgPath),
+                  // size: 1.29MB
+                  image: NetworkImage(imgPath),
                   fit: BoxFit.contain,
                   height: 60,
                   width: 80,
                 ),
               ),
             ),
-          Text(
+            Text(
               name != null ? name : '',
               style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Varela',
-                  fontSize: 15.0),
+                  color: Colors.black, fontFamily: 'Varela', fontSize: 15.0),
               softWrap: false,
               maxLines: 3,
               overflow: TextOverflow.fade,
@@ -603,7 +610,6 @@ class _ShopPageState extends State<ShopPage> {
     return InkWell(
       highlightColor: Colors.transparent,
       splashColor: Colors.white,
-
       child: Container(
         margin: EdgeInsets.all(5),
         padding: EdgeInsets.all(0),
@@ -614,22 +620,25 @@ class _ShopPageState extends State<ShopPage> {
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
-           
-            color: Colors.white,
-                   border: Border.all(color: Colors.grey.shade300, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade300, width: 2),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
-                              child: Image.network(
-                  imgPath,
-                  fit: BoxFit.fitWidth,
-                  
-                  height: 180,
-                  width: 430,
-                ),
+              child: ProgressiveImage(
+                //imgPath,
+                placeholder: AssetImage('assets/placeholder.jpg'),
+                // size: 1.87KB
+                thumbnail: NetworkImage('https://i.imgur.com/7XL923M.jpg'),
+                // size: 1.29MB
+                image: NetworkImage(imgPath),
+                fit: BoxFit.fitWidth,
+                height: 180,
+                width: 430,
               ),
-                      
+            ),
           ],
         ),
       ),
     );
-  }}
+  }
+}

@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:foodexpress/src/screens/Help.dart';
 import 'package:foodexpress/src/screens/ProfilePage.dart';
 import 'package:foodexpress/src/screens/Transaction.dart';
 import 'package:foodexpress/src/screens/cartpage.dart';
-import 'package:foodexpress/src/screens/cat.dart';
 import 'package:foodexpress/src/screens/loginPage.dart';
 import 'package:foodexpress/src/screens/orderhistory.dart';
 import 'package:foodexpress/src/screens/signupPage.dart';
@@ -20,7 +18,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config/api.dart';
 import 'package:foodexpress/src/shared/drawer.dart';
 import 'src/screens/ShopPage.dart';
-
 
 void main() => runApp(MyApp());
 
@@ -37,6 +34,8 @@ class MyApp extends StatelessWidget {
       child: ScopedModel(
           model: CartModel(),
           child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+
             theme: ThemeData(
               primarySwatch: Colors.green,
             ),
@@ -49,8 +48,8 @@ class MyApp extends StatelessWidget {
               '/cart': (BuildContext context) => CartPage(),
               '/register': (BuildContext context) => Register(),
               '/login': (BuildContext context) => LoginPage(),
-            '/Help': (BuildContext context) => HelpPage(),
-        //      '/Ordernow': (BuildContext context) => OrderNowPage(),
+              '/Help': (BuildContext context) => HelpPage(),
+              //      '/Ordernow': (BuildContext context) => OrderNowPage(),
               // '/Goout': (BuildContext context) => ShopPage()
               '/Shop': (BuildContext context) => ShopPage()
             },
@@ -95,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     token = Provider.of<AuthProvider>(context, listen: false).token;
-    
+
     firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> msg) {
         print(" onLaunch called ${(msg)}");
@@ -135,15 +134,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final _tabs = [
       // OrderNowPage(),
-     // GooutPage(),
-     ShopPage(),
+      // GooutPage(),
+      ShopPage(),
       Transaction(),
       ProfilePage(),
       OrderPage(),
       CartPage(),
       LoginPage(),
       HelpPage(),
-      SampleApp(),
       // ShopPage(),
       // GooutPage(),
     ];
@@ -169,24 +167,27 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         title: Text(
-                _sitename != null ? _sitename : '',
-              style: Theme.of(context).textTheme.headline6.merge(TextStyle(letterSpacing: 1.3)),
-            ),
+          _sitename != null ? _sitename : '',
+          style: Theme.of(context)
+              .textTheme
+              .headline6
+              .merge(TextStyle(letterSpacing: 1.3)),
+        ),
         actions: <Widget>[
-        //  authenticated == Status.Authenticated
-         //     ?
-               Text('Echo'),
-              // : IconButton(
-              //     padding: EdgeInsets.all(0),
-              //     onPressed: () {
-              //       Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //               builder: (context) => ShopPage()));
-              //     },
-              //     iconSize: 25,
-              //     icon: Icon(Icons.search, color: Color(0xff44c662)),
-              //   ),
+          //  authenticated == Status.Authenticated
+          //     ?
+          Text('Echo'),
+          // : IconButton(
+          //     padding: EdgeInsets.all(0),
+          //     onPressed: () {
+          //       Navigator.push(
+          //           context,
+          //           MaterialPageRoute(
+          //               builder: (context) => ShopPage()));
+          //     },
+          //     iconSize: 25,
+          //     icon: Icon(Icons.search, color: Color(0xff44c662)),
+          //   ),
           // IconButton(
           //   padding: EdgeInsets.all(0),
           //   iconSize: 25,

@@ -3,15 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:foodexpress/config/api.dart';
 import 'package:foodexpress/main.dart';
+import 'package:foodexpress/models/cartmodel.dart';
+import 'package:foodexpress/src/screens/loginPage.dart';
 import 'package:foodexpress/src/utils/CustomTextStyle.dart';
 import 'package:http/http.dart' as http;
 import 'package:paytm/paytm.dart';
+import 'dart:io' show Platform;
+
+import 'package:scoped_model/scoped_model.dart';
 
 class PaymentPaytm extends StatefulWidget {
   String OrderID;
   String amount;
   String customerToken;
-  PaymentPaytm({Key key,this.amount,this.OrderID, this.customerToken}) : super(key: key);
+  PaymentPaytm({Key key, this.amount, this.OrderID, this.customerToken})
+      : super(key: key);
   @override
   _PaymentPaytmState createState() => _PaymentPaytmState();
 }
@@ -19,36 +25,70 @@ class PaymentPaytm extends StatefulWidget {
 class _PaymentPaytmState extends State<PaymentPaytm> {
   String payment_response = null;
   String currency;
-    static String api =  FoodApi.baseApi;
-  //Live
-  // String mid = "MrECHO44772381378639";
-  // String PAYTM_MERCHANT_KEY = "LXtNiLMmgrDHpK_k";
+  static String api = FoodApi.baseApi;
 
-  String mid = "gjaJRh46023394480259";
-  String PAYTM_MERCHANT_KEY = "eCb&j_Tmyg#cHH4Z";
+  // String mid = "gjaJRh46023394480259";
+  // String PAYTM_MERCHANT_KEY = "eCb&j_Tmyg#cHH4Z";
+  String mid = "MrECHO44772381378639";
+  String PAYTM_MERCHANT_KEY = "LXtNiLMmgrDHpK_k";
   String website = "DEFAULT";
-  bool testing = true;
-
-  //Testing
-  // String mid = "TEST_MID_HERE";
-  // String PAYTM_MERCHANT_KEY = "TES_KEY_HERE";
-  // String website = "WEBSTAGING";
-  // bool testing = true;
+  bool testing = false;
 
   double amount = 1;
   bool loading = false;
 
+  String os = Platform.operatingSystem; //in your code
   @override
   void initState() {
     super.initState();
   }
 
+  Future<bool> _onBackPressed() {
+    return showDialog(
+          context: context,
+          barrierDismissible: false, // user must tap button for close dialog!
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Are you sure?'),
+              content:
+                  const Text('If you Dont Complete Payment, Your Order will be Deleted'),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text('NO'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+                FlatButton(
+                  child: const Text('YES'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    ScopedModel.of<CartModel>(context, rebuildOnChange: true)
+                        .clearCart();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MyHomePage(tabsIndex: 0),
+                    ));
+                  },
+                )
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    var platform = Theme.of(context).platform;
+      debugShowCheckedModeBanner: false;
+      return WillPopScope(
+        onWillPop: _onBackPressed,
+      child: Scaffold(
         appBar: AppBar(
-          title: const Text('Paytm example app'),
+          title: Text(platform == TargetPlatform.iOS ? 'iOS' : 'Android'),
+          backgroundColor: Colors.green,
+          //title: const Text('Paytm'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -57,149 +97,99 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // Text(
-                //     'Test Credentials works only on Android. Also make sure Paytm APP is not installed (For Testing).'),
-
-                // SizedBox(
-                //   height: 10,
-                // ),
-
-                // TextField(
-                //   onChanged: (value) {
-                //     mid = value;
-                //   },
-                //   decoration: InputDecoration(hintText: "Enter MID here"),
-                //   keyboardType: TextInputType.text,
-                // ),
-                // TextField(
-                //   onChanged: (value) {
-                //     PAYTM_MERCHANT_KEY = value;
-                //   },
-                //   decoration:
-                //       InputDecoration(hintText: "Enter Merchant Key here"),
-                //   keyboardType: TextInputType.text,
-                // ),
-                // TextField(
-                //   onChanged: (value) {
-                //     website = value;
-                //   },
-                //   decoration: InputDecoration(
-                //       hintText: "Enter Website here (Probably DEFAULT)"),
-                //   keyboardType: TextInputType.text,
-                // ),
-                // TextField(
-                //   onChanged: (value) {
-                //     try {
-                //       amount = double.tryParse(value);
-                //     } catch (e) {
-                //       print(e);
-                //     }
-                //   },
-                //   decoration: InputDecoration(hintText: "Enter Amount here"),
-                //   keyboardType: TextInputType.number,
-                // ),
-                 Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              child: ListTile(
-                contentPadding: EdgeInsets.symmetric(vertical: 0),
-                leading: Icon(
-                  Icons.monetization_on,
-                  color: Theme.of(context).hintColor,
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(vertical: 0),
+                    // leading: Icon(
+                    //   Icons.monetization_on,
+                    //   color: Theme.of(context).hintColor,
+                    // ),
+                    title: Text(
+                      'Total Amount ${widget.amount}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: CustomTextStyle.textFormFieldMedium.copyWith(
+                          color: Colors.black54,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
-                title: Text(
-                  'Total Amount $currency ${widget.amount}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style:CustomTextStyle.textFormFieldMedium.copyWith(
-                      color: Colors.black54,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                SizedBox(height: 10),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: Container(
+                      height: 300,
+                      decoration: BoxDecoration(
+                        image: new DecorationImage(
+                          image: new ExactAssetImage('assets/images/paymentlogo.jpg'),
+                          fit: BoxFit.contain,
+                        ),
+                      )),
                 ),
-              ),
-            ),
                 SizedBox(
                   height: 10,
                 ),
-                payment_response != null
-                    ? Text('Response: $payment_response\n')
+                payment_response != null ? Text('\n') : Container(),
+                loading
+                    ? Center(
+                        child: Container(
+                            width: 30,
+                            height: 30,
+                            child: CircularProgressIndicator()),
+                      )
                     : Container(),
-               loading
-                   ? Center(
-                       child: Container(
-                           width: 50,
-                           height: 50,
-                           child: CircularProgressIndicator()),
-                     )
-                   : Container(),
                 RaisedButton(
-                  onPressed: () {
-                    //Firstly Generate CheckSum bcoz Paytm Require this
-                    generateTxnToken(0);
-                  },
-                  color: Colors.blue,
-                  child: Text(
-                    "Pay using Wallet",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    //Firstly Generate CheckSum bcoz Paytm Require this
-                    generateTxnToken(1);
-                  },
-                  color: Colors.blue,
-                  child: Text(
-                    "Pay using Net Banking",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    //Firstly Generate CheckSum bcoz Paytm Require this
-                    generateTxnToken(2);
-                  },
-                  color: Colors.blue,
-                  child: Text(
-                    "Pay using UPI",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    //Firstly Generate CheckSum bcoz Paytm Require this
-                    generateTxnToken(3);
-                  },
-                  color: Colors.blue,
-                  child: Text(
-                    "Pay using Credit Card",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                    onPressed: () {
+                      //Firstly Generate CheckSum bcoz Paytm Require this
+                      generateTxnToken(0);
+                    },
+                    color: Color(0xFFF17532),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 18.0, right: 18),
+                      child: Container(
+                          width: MediaQuery.of(context).size.width - 50.0,
+                          height: 50.0,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25.0)),
+                          //   color: Color(0xFFF17532)),
+                          child: Center(
+                              child: Text('Payment',
+                                  style: TextStyle(
+                                      fontFamily: 'nunito',
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)))),
+                    ))
               ],
             ),
           ),
         ),
       ),
-    );
+      );
   }
+
   void generateTxnToken(int mode) async {
     setState(() {
       loading = true;
     });
     String orderId = this.widget.OrderID.toString();
+
     String callBackUrl = (testing
             ? 'https://securegw-stage.paytm.in'
             : 'https://securegw.paytm.in') +
         '/theia/paytmCallback?ORDER_ID=' +
         orderId;
-  //  var url = 'https://desolate-anchorage-29312.herokuapp.comf/generateTxnToken';
-          // String mid = "MrECHO44772381378639";
-          // String PAYTM_MERCHANT_KEY = "LXtNiLMmgrDHpK_k";
 
-//staging
-          String mid = "gjaJRh46023394480259";
-          String PAYTM_MERCHANT_KEY = "eCb&j_Tmyg#cHH4Z";
-          String website = "DEFAULT";
+    //callBackUrl = 'https://mrecho.in/paytm/callback';
+    String mid = "MrECHO44772381378639";
+    String PAYTM_MERCHANT_KEY = "LXtNiLMmgrDHpK_k";
+    // String mid = "gjaJRh46023394480259";
+    // String PAYTM_MERCHANT_KEY = "eCb&j_Tmyg#cHH4Z";
+    String website = "DEFAULT";
     final url = "$api/orders/$orderId/get-txn-token";
     var body = json.encode({
       "mid": mid,
@@ -214,12 +204,14 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
     });
     try {
       //var response = await http.get(url, headers: {HttpHeaders.authorizationHeader: 'Bearer ${widget.customerToken}'});
-          final response = await http.get(url,headers: {HttpHeaders.authorizationHeader: 'Bearer ${widget.customerToken}'});
-    // final response = await http.get(
+      final response = await http.get(url, headers: {
+        HttpHeaders.authorizationHeader: 'Bearer ${widget.customerToken}'
+      });
+      // final response = await http.get(
       //   url,
       //   headers: {'Content-type': "application/json"},
       // );
-      
+
       // print("Response is");
       // print(response.body);
       var resBody = json.decode(response.body);
@@ -229,38 +221,82 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
       });
       var paytmResponse = Paytm.payWithPaytm(
           mid, orderId, txnToken, amount.toString(), callBackUrl, testing);
+
       paytmResponse.then((value) {
-      //  print(value);
+        print(value);
         setState(() async {
           loading = false;
-         payment_response = value.toString();
-         if  (value['RESPMSG'] == 'Txn Success') {
-           final url = "$api/orders/payment";
-    Map<String, String> body = {
-      'order_id': widget.OrderID,
-      'amount': widget.amount,
-      'payment_method': '20',
-      'payment_transaction_id': value['TXNID'],
-    };
+          payment_response = value.toString();
+          if (value['RESPMSG'] == 'Txn Success') {
+            final url = "$api/orders/payment";
+            Map<String, String> body = {
+              'order_id': widget.OrderID,
+              'amount': widget.amount,
+              'payment_method': '20',
+              'payment_transaction_id': value['TXNID'],
+            };
 
-    final responseBody = await http.post(url, body: body,headers: {HttpHeaders.authorizationHeader: 'Bearer ${widget.customerToken}'});
-    if(responseBody.statusCode == 200){
+            final responseBody = await http.post(url, body: body, headers: {
+              HttpHeaders.authorizationHeader: 'Bearer ${widget.customerToken}'
+            });
+            if (responseBody.statusCode == 200) {
+              _showDialog("SUCCESSFUL", "assets/success_logo.png");
 
-      _showDialog("SUCCESSFUL", "assets/success_logo.png");
+              // Navigator.push(
+              //     context, MaterialPageRoute(builder: (context) => MyHomePage(title:'My Order',tabsIndex: 1,)));
+            }
+            // else if (value['response']['STATUS'] == 'TXN_SUCCESS') {
 
-      // Navigator.push(
-      //     context, MaterialPageRoute(builder: (context) => MyHomePage(title:'My Order',tabsIndex: 1,)));
-    }
-    else {
-      _showDialog("UNSUCCESSFUL", "assets/unsuccess_logo.png");
-    }
-         }
+            // }
+            else {
+              _showDialog("UNSUCCESSFUL", "assets/unsuccess_logo.png");
+            }
+          } else if (value['response']['STATUS'] == 'TXN_SUCCESS') {
+            final url = "$api/orders/payment";
+            Map<String, String> body = {
+              'order_id': widget.OrderID,
+              'amount': widget.amount,
+              'payment_method': '20',
+              'payment_transaction_id': value['response']['TXNID'],
+            };
+
+            final responseBody = await http.post(url, body: body, headers: {
+              HttpHeaders.authorizationHeader: 'Bearer ${widget.customerToken}'
+            });
+            if (responseBody.statusCode == 200) {
+//              _showDialog("SUCCESSFUL", "assets/success_logo.png");
+              _showDialog("Check Your Order", "assets/icons/ic_thank_you.png");
+              // Navigator.push(;
+              //     context, MaterialPageRoute(builder: (context) => MyHomePage(title:'My Order',tabsIndex: 1,)));
+            }
+            // else if (value['response']['STATUS'] == 'TXN_SUCCESS') {
+
+            // }
+          } else if (value['error'] == false) {
+            final url = "$api/orders/payment";
+            Map<String, String> body = {
+              'order_id': widget.OrderID,
+              'amount': widget.amount,
+              'payment_method': '20',
+              'payment_transaction_id': value['TXNID'],
+            };
+            _showDialog("Check Your Order", "assets/icons/ic_thank_you.png");
+          } else {
+            _showDialog("UNSUCCESSFUL", "assets/unsuccess_logo.png");
+          }
         });
       });
     } catch (e) {
-      print(e);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MyHomePage(
+                    title: 'My Order',
+                    tabsIndex: 3,
+                  )));
     }
   }
+
   void _showDialog(String message, String logo) {
     // flutter defined function
     showDialog(
@@ -270,15 +306,14 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
         return AlertDialog(
           title: Center(child: new Text("Payment Status")),
           content: new Container(
-            height: 100.0,
+            height: 300.0,
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 new Image.asset(
                   "$logo",
-                  height: 50.0,
-                  width: 50.0,
+                  width: 300.0,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 20.0),
@@ -300,8 +335,13 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
               child: new Text("My order"),
               onPressed: () {
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => MyHomePage(title:'My Order',tabsIndex: 3,)));
-                },
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MyHomePage(
+                              title: 'My Order',
+                              tabsIndex: 3,
+                            )));
+              },
             ),
           ],
         );
@@ -309,4 +349,3 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
     );
   }
 }
-

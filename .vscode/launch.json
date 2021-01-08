@@ -5,21 +5,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dart",
-            "type": "dart",
+            "name": "customer",
             "request": "launch",
-            "program": "bin/main.dart"
-        },
-        {
-            "name": "Dart",
-            "type": "dart",
-            "request": "launch",
-            "program": "bin/main.dart"
-        },
-        {
-            "name": "MrEcho Customer",
-            "request": "launch",
-            "type": "dart",
+            "type": "dart"
         }
     ]
 }

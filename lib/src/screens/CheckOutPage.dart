@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,7 +17,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-
 class CheckOutPage extends StatefulWidget {
   @override
   _CheckOutPageState createState() => _CheckOutPageState();
@@ -28,10 +26,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String api = FoodApi.baseApi;
- String _OrderSucess;
- String _OrderAmount;
- String OrderFile;
- String _OrderId;
+  String _OrderSucess;
+  String _OrderAmount;
+  String OrderFile;
+  String _OrderId;
   File _image;
   String base64Image;
   String fileName;
@@ -44,7 +42,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
   double delivery_charge;
   double total;
   String token;
-  final RoundedLoadingButtonController _btnController = new RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _btnController =
+      new RoundedLoadingButtonController();
 
   void _doSomething() async {
     Timer(Duration(seconds: 3), () {
@@ -52,42 +51,73 @@ class _CheckOutPageState extends State<CheckOutPage> {
     });
   }
 
-  Future<String> submitOrder(cart,customer_mobile,delivery_address,total, ShopID, delivery_charge,remarks,customer_lat,customer_long,token) async {
-
+  Future<String> submitOrder(
+      cart,
+      customer_mobile,
+      delivery_address,
+      total,
+      ShopID,
+      delivery_charge,
+      remarks,
+      customer_lat,
+      customer_long,
+      token) async {
     List<Map> items = new List();
     List<Map> itemsOption = new List();
     cart.forEach((element) {
-      if(element.options !=null){
-        element.options.forEach((element) => itemsOption.add(Options(id:element.id.toString(),name: element.name,price: element.price).TojsonData()));
+      if (element.options != null) {
+        element.options.forEach((element) => itemsOption.add(Options(
+                id: element.id.toString(),
+                name: element.name,
+                price: element.price)
+            .TojsonData()));
       }
     });
     print(itemsOption);
-    cart.forEach((element) => items.add(ItemProduct(shop_id: ShopID, product_id: element.id, unit_price: element.price, discounted_price:0.0, quantity: element.qty,shop_product_variation_id:element.variation_id,options:itemsOption ).TojsonData()));
-    var  body =json.encode({
-      "items" : json.encode(items),
-      "customer_mobile" : customer_mobile,
-      "delivery_address" : delivery_address,
-      "delivery_charge" : delivery_charge,
-      "customer_lat" : customer_lat,
-      "customer_long" : customer_long,
-      "remarks" : 'remarks',
-      "total" : total,
-      "shop_id" : ShopID,
-      "image": base64Image != null ? base64Image:'',
-      "fileName": fileName != null?fileName:'',
+    cart.forEach((element) => items.add(ItemProduct(
+            shop_id: ShopID,
+            product_id: element.id,
+            unit_price: element.price,
+            discounted_price: 0.0,
+            quantity: element.qty,
+            shop_product_variation_id: element.variation_id,
+            options: itemsOption)
+        .TojsonData()));
+    var body = json.encode({
+      "items": json.encode(items),
+      "customer_mobile": customer_mobile,
+      "delivery_address": delivery_address,
+      "delivery_charge": delivery_charge,
+      "customer_lat": customer_lat,
+      "customer_long": customer_long,
+      "remarks": 'remarks',
+      "total": total,
+      "shop_id": ShopID,
+      "image": base64Image != null ? base64Image : '',
+      "fileName": fileName != null ? fileName : '',
     });
 
     final url = "$api/orders";
-    var response =  await http.post(url, headers: {HttpHeaders.authorizationHeader: 'Bearer $token',HttpHeaders.contentTypeHeader: "application/json; charset=utf-8"}, body: body);
+    var response = await http.post(url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+          HttpHeaders.contentTypeHeader: "application/json; charset=utf-8"
+        },
+        body: body);
     var resBody = json.decode(response.body);
     if (response.statusCode == 200) {
       setState(() {
         _OrderSucess = resBody['message'];
         _OrderId = resBody['data']['id'].toString();
         _OrderAmount = resBody['data']['total'].toString();
- //       showThankYouBottomSheet(context,resBody['message'],resBody['data']['id'].toString(),resBody['data']['total'].toString());
-     Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => PaymentMethodsPage(amount: _OrderAmount,orderID: _OrderId,)));
+        //       showThankYouBottomSheet(context,resBody['message'],resBody['data']['id'].toString(),resBody['data']['total'].toString());
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaymentMethodsPage(
+                      amount: _OrderAmount,
+                      orderID: _OrderId,
+                    )));
         ScopedModel.of<CartModel>(context, rebuildOnChange: true).clearCart();
       });
     } else {
@@ -116,11 +146,22 @@ class _CheckOutPageState extends State<CheckOutPage> {
       },
     );
   }
-  Map<String, dynamic> user = {"name" :'', "email" :'', "image" :'',"username":'',"phone":'',"address":''};
+
+  Map<String, dynamic> user = {
+    "name": '',
+    "email": '',
+    "image": '',
+    "username": '',
+    "phone": '',
+    "address": ''
+  };
   Future<String> getmyProfile(token) async {
     final url = "$api/me";
 
-    var response = await http.get(url,headers: {HttpHeaders.authorizationHeader: 'Bearer $token',HttpHeaders.contentTypeHeader: "application/json; charset=utf-8"});
+    var response = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+      HttpHeaders.contentTypeHeader: "application/json; charset=utf-8"
+    });
     var resBody = json.decode(response.body);
     if (response.statusCode == 200) {
       setState(() {
@@ -137,14 +178,15 @@ class _CheckOutPageState extends State<CheckOutPage> {
     return "Sucess";
   }
 
-  bool _firstPress =true;
+  bool _firstPress = true;
   @override
   void initState() {
     super.initState();
-     _firstPress = true ;
+    _firstPress = true;
     final token = Provider.of<AuthProvider>(context, listen: false).token;
     getmyProfile(token);
   }
+
   @override
   Widget build(BuildContext context) {
     final token = Provider.of<AuthProvider>(context, listen: true).token;
@@ -156,9 +198,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
         base64Image = base64Encode(_image.readAsBytesSync());
         fileName = _image.path.split("/").last;
       });
-
     }
+
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomPadding: false,
@@ -169,13 +212,13 @@ class _CheckOutPageState extends State<CheckOutPage> {
               onPressed: () {
                 Navigator.pop(context);
               }),
+          elevation: 0,
+          centerTitle: true,
           title: Text(
             "Checkout",
-            style: TextStyle(color: Colors.white, fontSize: 14),
           ),
         ),
-        body:
-        Builder(builder: (context) {
+        body: Builder(builder: (context) {
           return Column(
             children: <Widget>[
               Expanded(
@@ -183,95 +226,203 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   child: ListView(
                     children: <Widget>[
                       Form(
-                        key: _formKey,
-                      child:Column(
-                          children: <Widget>[
-                          selectedAddressSection(user),
-                            Column(
-                              children: <Widget>[
-                                Container(
-                                    child: Text(fileName != null?fileName:'')
-                                ),
-                                SizedBox(
-                                  height: 6,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Text('Add Attachment')
-                                    ),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: IconButton(
-                                        icon: Icon(
-                                          Icons.camera,
-                                          size: 30.0,
-                                        ),
-                                        onPressed: () {
-                                          getImage();
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          key: _formKey,
+                          child: Column(children: <Widget>[
+                            selectedAddressSection(user),
+                            // Column(
+                            //   children: <Widget>[
+                            //     Container(
+                            //         child: Text(fileName != null?fileName:'')
+                            //     ),
+                            //     SizedBox(
+                            //       height: 6,
+                            //     ),
+                            //     Row(
+                            //       mainAxisAlignment: MainAxisAlignment.center,
+                            //       children: <Widget>[
+                            //         Align(
+                            //           alignment: Alignment.center,
+                            //           child: Text('Add Attachment')
+                            //         ),
+                            //         Align(
+                            //           alignment: Alignment.center,
+                            //           child: IconButton(
+                            //             icon: Icon(
+                            //               Icons.camera,
+                            //               size: 30.0,
+                            //             ),
+                            //             onPressed: () {
+                            //               getImage();
+                            //             },
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ],
+                            // ),
                             priceSection(currency),
-                        ]
-                      )
-                      ),
+                          ])),
                     ],
                   ),
                 ),
                 flex: 90,
               ),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  child:  RoundedLoadingButton(
-                    controller: _btnController,
-                    onPressed: () {
-                        final form = _formKey.currentState;
-                          if(form.validate()){
-                            if(_firstPress){
-                              _firstPress = false;
-                              submitOrder(
-                                  ScopedModel.of<CartModel>(context, rebuildOnChange: true).cart,
-                                  customer_mobile,
-                                  delivery_address,
-                                  ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalCartValue + 0 +ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge,
-                                  ScopedModel.of<CartModel>(context, rebuildOnChange: true).ShopID,
-                                  ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge,
-                                  '','_555','_6666',token);
-                            }
-                            if(_OrderSucess != null){
-                              ScopedModel.of<CartModel>(context, rebuildOnChange: true).clearCart();
-                              //showThankYouBottomSheet(context,_OrderSucess,_OrderId,_OrderAmount);
-                                      Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => PaymentMethodsPage(amount: _OrderAmount,orderID: _OrderId,)));
-                            }
-                          }
-                    },
-                    
-                    child: Text(
-                      "Place Order",
-                      style: CustomTextStyle.textFormFieldMedium.copyWith(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    color: Colors.green,
-                   // textColor: Colors.white,
-                  width: 800,
+
+              Container(
+                height: 150,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Theme.of(context).focusColor.withOpacity(0.15),
+                          offset: Offset(0, -2),
+                          blurRadius: 5.0)
+                    ]),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                                'NOTE:- If you Place order then you can not add new item for same order ',
+                                style: CustomTextStyle.textFormFieldMedium
+                                    .copyWith(
+                                        color: Colors.blueGrey,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600)),
+                          ),
+                          SizedBox(height: 15),
+                        ],
+                      ),
+                      SizedBox(height: 25),
+                      Stack(
+                        fit: StackFit.loose,
+                        alignment: AlignmentDirectional.centerEnd,
+                        children: <Widget>[
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 40,
+                            child: RoundedLoadingButton(
+                              controller: _btnController,
+                              onPressed: () {
+                                final form = _formKey.currentState;
+                                if (form.validate()) {
+                                  if (_firstPress) {
+                                    _firstPress = false;
+                                    submitOrder(
+                                        ScopedModel.of<CartModel>(context,
+                                                rebuildOnChange: true)
+                                            .cart,
+                                        customer_mobile,
+                                        delivery_address,
+                                        ScopedModel.of<CartModel>(context,
+                                                    rebuildOnChange: true)
+                                                .totalCartValue +
+                                            0 +
+                                            ScopedModel.of<CartModel>(context,
+                                                    rebuildOnChange: true)
+                                                .deliveryCharge,
+                                        ScopedModel.of<CartModel>(context,
+                                                rebuildOnChange: true)
+                                            .ShopID,
+                                        ScopedModel.of<CartModel>(context,
+                                                rebuildOnChange: true)
+                                            .deliveryCharge,
+                                        '',
+                                        '_555',
+                                        '_6666',
+                                        token);
+                                  }
+                                  if (_OrderSucess != null) {
+                                    ScopedModel.of<CartModel>(context,
+                                            rebuildOnChange: true)
+                                        .clearCart();
+                                    //showThankYouBottomSheet(context,_OrderSucess,_OrderId,_OrderAmount);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PaymentMethodsPage(
+                                                  amount: _OrderAmount,
+                                                  orderID: _OrderId,
+                                                )));
+                                  }
+                                }
+                              },
+
+                              child: Text(
+                                "Place Order",
+                                style: CustomTextStyle.textFormFieldMedium
+                                    .copyWith(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                              ),
+                              color: Colors.green,
+                              // textColor: Colors.white,
+                              width: 800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                    ],
                   ),
-                  
                 ),
-                
-                flex: 10,
-              )
+              ),
+
+              // Expanded(
+              //   child: Container(
+              //     width: double.infinity,
+              //     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              //     child:  RoundedLoadingButton(
+              //       controller: _btnController,
+              //       onPressed: () {
+              //           final form = _formKey.currentState;
+              //             if(form.validate()){
+              //               if(_firstPress){
+              //                 _firstPress = false;
+              //                 submitOrder(
+              //                     ScopedModel.of<CartModel>(context, rebuildOnChange: true).cart,
+              //                     customer_mobile,
+              //                     delivery_address,
+              //                     ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalCartValue + 0 +ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge,
+              //                     ScopedModel.of<CartModel>(context, rebuildOnChange: true).ShopID,
+              //                     ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge,
+              //                     '','_555','_6666',token);
+              //               }
+              //               if(_OrderSucess != null){
+              //                 ScopedModel.of<CartModel>(context, rebuildOnChange: true).clearCart();
+              //                 //showThankYouBottomSheet(context,_OrderSucess,_OrderId,_OrderAmount);
+              //                         Navigator.push(
+              //                     context, MaterialPageRoute(builder: (context) => PaymentMethodsPage(amount: _OrderAmount,orderID: _OrderId,)));
+              //               }
+              //             }
+              //       },
+
+              //       child: Text(
+              //         "Place Order",
+              //         style: CustomTextStyle.textFormFieldMedium.copyWith(
+              //             color: Colors.white,
+              //             fontSize: 14,
+              //             fontWeight: FontWeight.bold),
+              //       ),
+              //       color: Colors.green,
+              //      // textColor: Colors.white,
+              //     width: 800,
+              //     ),
+
+              //   ),
+
+              //   flex: 10,
+              // )
             ],
           );
         }),
@@ -279,10 +430,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 
-  showThankYouBottomSheet(BuildContext context, resBody,orderId,amount) {
+  showThankYouBottomSheet(BuildContext context, resBody, orderId, amount) {
     return _scaffoldKey.currentState.showBottomSheet((context) {
-      return
-        Container(
+      return Container(
         height: 400,
         decoration: BoxDecoration(
             color: Colors.white,
@@ -322,15 +472,18 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       height: 24,
                     ),
                     new Container(
-                      child:
-                      new Row(
+                      child: new Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-
                           RaisedButton(
                             onPressed: () {
-                            Navigator.push(
-                                context, MaterialPageRoute(builder: (context) => MyHomePage(title:'My Order',tabsIndex: 1,)));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyHomePage(
+                                            title: 'My Order',
+                                            tabsIndex: 1,
+                                          )));
                             },
                             padding: EdgeInsets.only(left: 35, right: 35),
                             child: Text(
@@ -340,7 +493,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             ),
                             color: Colors.green,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(24))),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(24))),
                           ),
                           SizedBox(
                             width: 20,
@@ -348,7 +502,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
                           RaisedButton(
                             onPressed: () {
                               Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => PaymentMethodsPage(amount: amount,orderID: orderId,)));
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PaymentMethodsPage(
+                                            amount: amount,
+                                            orderID: orderId,
+                                          )));
                             },
                             padding: EdgeInsets.only(left: 35, right: 35),
                             child: Text(
@@ -358,13 +517,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             ),
                             color: Colors.green,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(24))),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(24))),
                           )
-
                         ],
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -433,6 +591,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
       ),
     );
   }
+
   Widget _phoneWidget() {
     return Column(
       children: <Widget>[
@@ -458,12 +617,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   validator: (value) {
                     customer_mobile = value.trim();
                     return Validate.requiredField(value, 'Phone is required.');
-                  }
-              )
+                  })
             ],
           ),
-
-
         )
       ],
     );
@@ -492,13 +648,11 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       filled: true),
                   validator: (value) {
                     delivery_address = value.trim();
-                    return Validate.requiredField(value, 'address is required.');
-                  }
-              )
+                    return Validate.requiredField(
+                        value, 'address is required.');
+                  })
             ],
           ),
-
-
         )
       ],
     );
@@ -509,11 +663,13 @@ class _CheckOutPageState extends State<CheckOutPage> {
       margin: EdgeInsets.only(top: topMargin),
       child: Text(
         user,
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14,color: Colors.grey.shade800),
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.grey.shade800),
       ),
     );
   }
-
 
   priceSection(currency) {
     return Container(
@@ -555,11 +711,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
               SizedBox(
                 height: 8,
               ),
-
-              createPriceItem("Order Total",currency, '${ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalCartValue}',
+              createPriceItem(
+                  "Order Total",
+                  currency,
+                  '${ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalCartValue}',
                   Colors.grey.shade700),
               createPriceItem(
-                  "Delievery Charges",currency, '${ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge}', Colors.teal.shade300),
+                  "Delievery Charges",
+                  currency,
+                  '${ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge}',
+                  Colors.teal.shade300),
               SizedBox(
                 height: 8,
               ),
@@ -582,7 +743,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         .copyWith(color: Colors.black, fontSize: 12),
                   ),
                   Text(
-                      "$currency"+'${ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalCartValue + ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge }',
+                    "$currency" +
+                        '${ScopedModel.of<CartModel>(context, rebuildOnChange: true).totalCartValue + ScopedModel.of<CartModel>(context, rebuildOnChange: true).deliveryCharge}',
                     style: CustomTextStyle.textFormFieldMedium
                         .copyWith(color: Colors.black, fontSize: 12),
                   )
@@ -595,8 +757,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 
-
-  createPriceItem(String key,String currency, String value, Color color) {
+  createPriceItem(String key, String currency, String value, Color color) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
       child: Row(
@@ -608,7 +769,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 .copyWith(color: Colors.grey.shade700, fontSize: 12),
           ),
           Text(
-            '$currency'+value,
+            '$currency' + value,
             style: CustomTextStyle.textFormFieldMedium
                 .copyWith(color: color, fontSize: 12),
           )
@@ -617,15 +778,3 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

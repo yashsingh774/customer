@@ -149,8 +149,7 @@ class _CategoryState extends State<Category> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Are you sure?'),
-              content: const Text(
-                  'If you click back, the cart will be clear'),
+              content: const Text('If you click back, the cart will be clear'),
               actions: <Widget>[
                 FlatButton(
                   child: const Text('CANCEL'),
@@ -187,10 +186,10 @@ class _CategoryState extends State<Category> {
     // ignore: unused_local_variable
     final token = Provider.of<AuthProvider>(context).token;
     _sitename = Provider.of<AuthProvider>(context).sitename;
-       return WillPopScope(
-        onWillPop:_onBackPressed,
-       child: Scaffold(
-        body:  RefreshIndicator(
+    return WillPopScope(
+        onWillPop: _onBackPressed,
+        child: Scaffold(
+            body: RefreshIndicator(
                 key: refreshKey,
                 onRefresh: () async {
                   await refreshList();
@@ -220,7 +219,7 @@ class _CategoryState extends State<Category> {
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(5)),
                                       image: DecorationImage(
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.fill,
                                         image: shop['image'] != null
                                             ? NetworkImage(shop['image'])
                                             : AssetImage('assets/steak.png'),
@@ -246,7 +245,6 @@ class _CategoryState extends State<Category> {
                                                   CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Row(children: [
-                                                 
                                                   SizedBox(height: 2.0),
                                                   Text(
                                                       shop['name'] != null
@@ -439,40 +437,38 @@ class _CategoryState extends State<Category> {
                                               .subtitle1,
                                         ),
                                       ),
-                                     Container(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height /
-                                                  1.49,
-                                              width: MediaQuery.of(context)
+                                      Container(
+                                          height: MediaQuery.of(context)
                                                   .size
-                                                  .width,
-                                              child: new ListView.builder(
-                                                  shrinkWrap: true,
-                                                  primary: false,
-                                                  padding: EdgeInsets.all(8.0),
-                                                  itemCount: _products.length,
-                                                  scrollDirection:
-                                                      Axis.vertical,
-                                                  //      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount( crossAxisCount: 2, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 0.8),
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return _buildFoodCard(
-                                                        context,
-                                                        currency,
-                                                        _products[index], () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) => ProductPage(
+                                                  .height /
+                                              1.49,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: new ListView.builder(
+                                              shrinkWrap: true,
+                                              primary: false,
+                                              padding: EdgeInsets.all(8.0),
+                                              itemCount: _products.length,
+                                              scrollDirection: Axis.vertical,
+                                              //      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount( crossAxisCount: 2, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 0.8),
+                                              itemBuilder: (context, index) {
+                                                return _buildFoodCard(
+                                                    context,
+                                                    currency,
+                                                    _products[index], () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ProductPage(
                                                                   currency:
                                                                       currency,
                                                                   productData:
                                                                       _products[
                                                                           index],
                                                                   shop: shop)));
-                                                    });
-                                                  })),
+                                                });
+                                              })),
                                     ])))
                           ])),
                   // Positioned(
@@ -485,177 +481,177 @@ class _CategoryState extends State<Category> {
                   //         ),
                   // ),
                 ]))));
-  }}
-
-  Widget _buildFoodCard(context, currency, Product food, onTapped) {
-    return InkWell(
-      splashColor: Theme.of(context).accentColor,
-      focusColor: Theme.of(context).accentColor,
-      highlightColor: Theme.of(context).primaryColor,
-      onTap: onTapped,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20),
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).focusColor.withOpacity(0.15),
-                  offset: Offset(0, -2),
-                  blurRadius: 5.0)
-            ]),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              child: Container(
-                height: 60,
-                width: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  image: DecorationImage(
-                      image: NetworkImage(food.imgUrl), fit: BoxFit.fitHeight),
-                ),
-              ),
-            ),
-            SizedBox(width: 15),
-            Flexible(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          food.name,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          // ignore: deprecated_member_use
-                          style: Theme.of(context).textTheme.subhead,
-                        ),
-                        // Text(
-                        //   'Quantity - '+food.quantity.toString(),
-                        //   overflow: TextOverflow.ellipsis,
-                        //   maxLines: 2,
-                        //   style: Theme.of(context).textTheme.caption,
-                        // ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    '$currency' + food.price.toString(),
-                    style: CustomTextStyle.textFormFieldMedium.copyWith(
-                        color: Colors.black54,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
   }
+}
 
-  Widget sectionHeader(String headerTitle, {onViewMore}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(left: 15, top: 10),
-          child: Text(headerTitle, style: h4),
-        ),
-      ],
-    );
-  }
-
-// wrap the horizontal listview inside a sizedBox..
-  Widget headerTopCategories(context, shop, List _categories) {
-    return InkWell(
-        splashColor: Theme.of(context).accentColor,
-        focusColor: Theme.of(context).accentColor,
-        highlightColor: Theme.of(context).primaryColor,
-        child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    topLeft: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Theme.of(context).focusColor.withOpacity(0.15),
-                      offset: Offset(0, -2),
-                      blurRadius: 5.0)
-                ]),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                sectionHeader('All Categories', onViewMore: () {}),
-                SizedBox(
-                  height: 130,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    children: _categories.map((f) {
-                      return headerCategoryItem(
-                          context, f['name'], f['image'], f['id'], shop);
-                    }).toList(),
-                  ),
-                )
-              ],
-            )));
-  }
-
-  Widget headerCategoryItem(context, String name, String icon, int id, shop) {
-    return Container(
-      width: 70,
-      margin: EdgeInsets.only(left: 15),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+Widget _buildFoodCard(context, currency, Product food, onTapped) {
+  return InkWell(
+    splashColor: Theme.of(context).accentColor,
+    focusColor: Theme.of(context).accentColor,
+    highlightColor: Theme.of(context).primaryColor,
+    onTap: onTapped,
+    child: Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(20),
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+                color: Theme.of(context).focusColor.withOpacity(0.15),
+                offset: Offset(0, -2),
+                blurRadius: 5.0)
+          ]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Container(
-              margin: EdgeInsets.only(bottom: 10),
-              width: 70,
-              height: 70,
-              child: FlatButton(
-                color: Colors.white,
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ProductAllPage(
-                        category: name, categoryID: '$id', shop: shop),
-                  ));
-                },
-                child: Image(
-                  image: icon != null
-                      ? NetworkImage(icon)
-                      : AssetImage('assets/steak.png'),
-                  fit: BoxFit.contain,
-                  width: 150,
-                  height: 150,
+            child: Container(
+              height: 60,
+              width: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                image: DecorationImage(
+                    image: NetworkImage(food.imgUrl), fit: BoxFit.fitHeight),
+              ),
+            ),
+          ),
+          SizedBox(width: 15),
+          Flexible(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        food.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        // ignore: deprecated_member_use
+                        style: Theme.of(context).textTheme.subhead,
+                      ),
+                      // Text(
+                      //   'Quantity - '+food.quantity.toString(),
+                      //   overflow: TextOverflow.ellipsis,
+                      //   maxLines: 2,
+                      //   style: Theme.of(context).textTheme.caption,
+                      // ),
+                    ],
+                  ),
                 ),
-              )),
-          Text(
-            name,
-            overflow: TextOverflow.fade,
-            maxLines: 1,
-            softWrap: false,
-            style: categoryText,
+                SizedBox(width: 8),
+                Text(
+                  '$currency' + food.price.toString(),
+                  style: CustomTextStyle.textFormFieldMedium.copyWith(
+                      color: Colors.black54,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           )
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
+Widget sectionHeader(String headerTitle, {onViewMore}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Container(
+        margin: EdgeInsets.only(left: 15, top: 10),
+        child: Text(headerTitle, style: h4),
+      ),
+    ],
+  );
+}
+
+// wrap the horizontal listview inside a sizedBox..
+Widget headerTopCategories(context, shop, List _categories) {
+  return InkWell(
+      splashColor: Theme.of(context).accentColor,
+      focusColor: Theme.of(context).accentColor,
+      highlightColor: Theme.of(context).primaryColor,
+      child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(20),
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                    color: Theme.of(context).focusColor.withOpacity(0.15),
+                    offset: Offset(0, -2),
+                    blurRadius: 5.0)
+              ]),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              sectionHeader('All Categories', onViewMore: () {}),
+              SizedBox(
+                height: 130,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  children: _categories.map((f) {
+                    return headerCategoryItem(
+                        context, f['name'], f['image'], f['id'], shop);
+                  }).toList(),
+                ),
+              )
+            ],
+          )));
+}
+
+Widget headerCategoryItem(context, String name, String icon, int id, shop) {
+  return Container(
+    width: 70,
+    margin: EdgeInsets.only(left: 15),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Container(
+            margin: EdgeInsets.only(bottom: 10),
+            width: 70,
+            height: 70,
+            child: FlatButton(
+              color: Colors.white,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ProductAllPage(
+                      category: name, categoryID: '$id', shop: shop),
+                ));
+              },
+              child: Image(
+                image: icon != null
+                    ? NetworkImage(icon)
+                    : AssetImage('assets/steak.png'),
+                fit: BoxFit.contain,
+                width: 150,
+                height: 150,
+              ),
+            )),
+        Text(
+          name,
+          overflow: TextOverflow.fade,
+          maxLines: 1,
+          softWrap: false,
+          style: categoryText,
+        )
+      ],
+    ),
+  );
+}

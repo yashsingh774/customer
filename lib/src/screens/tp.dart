@@ -198,7 +198,8 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
         payment_response = resBody['body']['txnToken'];
       });
       var paytmResponse = Paytm.payWithPaytm(
-          mid, orderId, txnToken, amount.toString(), callBackUrl, testing);
+          mid, orderId, txnToken, amount.toString(), callBackUrl, testing
+          );
       paytmResponse.then((value) {
         print(value);
         setState(() {

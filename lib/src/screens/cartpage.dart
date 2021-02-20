@@ -313,7 +313,7 @@ class _CartPageState extends State<CartPage> {
             0
         ? SizedBox(height: 0)
         : Container(
-            height: 150,
+            height: 200,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             decoration: BoxDecoration(
                 color: Colors.white,
@@ -367,6 +367,28 @@ class _CartPageState extends State<CartPage> {
                     ],
                   ),
                   SizedBox(height: 20),
+                                    
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 40,
+                        child: FlatButton(
+                          onPressed: () {
+                           Navigator.of(context).pop(true); 
+                          },
+
+                          disabledColor:
+                              Theme.of(context).focusColor.withOpacity(0.5),
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          // ignore: unrelated_type_equality_checks
+                          color: Colors.lightBlue,
+                          shape: StadiumBorder(),
+                          child: Text(
+                            'Want To Add More Items',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.bodyText2.merge(
+                                TextStyle(color: Colors.white, fontSize: 18)),
+                          ),
+                        ),
+                      ),
                   Stack(
                     fit: StackFit.loose,
                     alignment: AlignmentDirectional.centerEnd,

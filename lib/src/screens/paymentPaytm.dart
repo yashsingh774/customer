@@ -34,7 +34,7 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
   String website = "DEFAULT";
   bool testing = false;
 
-  double amount = 1;
+  double amount ;
   bool loading = false;
 
   String os = Platform.operatingSystem; //in your code
@@ -86,9 +86,9 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
         onWillPop: _onBackPressed,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(platform == TargetPlatform.iOS ? 'iOS' : 'Android'),
+        //  title: Text(platform == TargetPlatform.iOS ? 'iOS' : 'Android'),
           backgroundColor: Colors.green,
-          //title: const Text('Paytm'),
+          title: const Text('Payment Page'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -220,7 +220,7 @@ class _PaymentPaytmState extends State<PaymentPaytm> {
         payment_response = resBody['body']['txnToken'];
       });
       var paytmResponse = Paytm.payWithPaytm(
-          mid, orderId, txnToken, amount.toString(), callBackUrl, testing);
+          mid, orderId, txnToken, widget.amount, callBackUrl, testing);
 
       paytmResponse.then((value) {
         print(value);

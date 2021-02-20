@@ -129,9 +129,9 @@ class _PaymentMethodsWidgetState extends State<PaymentMethodsPage> {
                     // SizedBox(height: 10),
 
                     PaymentMethodListItemWidget(
-                      paymentMethod: 'Paytm',
-                      logo: 'assets/images/paytm.jpg',
-                      description: 'Click to pay with your Paytm',
+                      paymentMethod: 'Click Here To Pay ',
+                      logo: 'assets/images/click.jpg',
+                      description: 'We Accept All Payment Modes',
                       route: PaymentPaytm(
                         amount: widget.amount,
                         OrderID: widget.orderID,

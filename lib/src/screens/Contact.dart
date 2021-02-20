@@ -40,7 +40,7 @@ class _ContactPageState extends State<ContactPage> {
                           child: Column(
                             children: <Widget>[
                               Text(
-                                'Phone :- ',
+                                'Phone :- 7024444605',
                                 style: Theme.of(context).textTheme.bodyText1,
                               ),
                               Text(

@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 import 'package:device_info/device_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +6,10 @@ import 'package:foodexpress/models/cartmodel.dart';
 import 'package:foodexpress/providers/auth.dart';
 import 'package:foodexpress/src/screens/Category.dart';
 import 'package:foodexpress/src/screens/Help.dart';
+import 'package:foodexpress/src/screens/HomeScreen.dart';
 import 'package:foodexpress/src/screens/ProfilePage.dart';
+import 'package:foodexpress/src/screens/ShopPage.dart';
+import 'package:foodexpress/src/screens/ShopPage.dart';
 import 'package:foodexpress/src/screens/Transaction.dart';
 import 'package:foodexpress/src/screens/cartpage.dart';
 import 'package:foodexpress/src/screens/loginPage.dart';
@@ -40,7 +43,8 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.green,
             ),
             routes: {
-              '/': (BuildContext context) => MyHomePage(),
+
+              '/': (BuildContext context) => IntroScreen(),
               '/home': (BuildContext context) => MyHomePage(),
               '/category': (BuildContext context) => Category(
                     shopID: '1',
@@ -49,9 +53,7 @@ class MyApp extends StatelessWidget {
               '/register': (BuildContext context) => Register(),
               '/login': (BuildContext context) => LoginPage(),
               '/Help': (BuildContext context) => HelpPage(),
-              //      '/Ordernow': (BuildContext context) => OrderNowPage(),
-              // '/Goout': (BuildContext context) => ShopPage()
-              '/Shop': (BuildContext context) => ShopPage()
+              '/Shop': (BuildContext context) => ShopPage(),
             },
           )),
     );
@@ -142,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
       CartPage(),
       LoginPage(),
       HelpPage(),
+      IntroScreen(),
       // ShopPage(),
       // GooutPage(),
     ];

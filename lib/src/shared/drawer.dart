@@ -434,6 +434,23 @@ class _AppDrawerState extends State<AppDrawer> {
               style: Theme.of(context).textTheme.subtitle1,
             ),
           ),
+
+                    ListTile(
+            onTap: () {
+         
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        MyHomePage(title: 'Contact Us ', tabsIndex: 7)));
+              },
+            leading: Icon(
+              Icons.help,
+              color: Theme.of(context).focusColor.withOpacity(1),
+            ),
+            title: Text(
+              'Contact Us ',
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+          ),
           
           // ListTile(
           //   onTap: () {

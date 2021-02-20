@@ -220,12 +220,15 @@ class _OrderHistoryPageState extends State<OrderPage> {
                                       ),
                                       Container(
                                         alignment: Alignment.topLeft,
-                                        child: Text(
-                                          'To Deliver On :' +
-                                              itemList[ind].deliveryTime,
-                                          style: TextStyle(
-                                              fontSize: 13.0, color: Colors.black54),
-                                        ),
+                                        // child: Text(
+                                        //   'To Deliver On :' +
+                                        //       itemList[ind].deliveryTime,
+                                        //   style: TextStyle(
+                                        //       fontSize: 13.0, color: Colors.black54),
+                                        // ),
+                                        child: Text("Due To Bulk Order We Deliver Your Order in 12 Hours",
+                                         style: TextStyle(color: Colors.red),),
+                                        
                                       ),
                                       Divider(
                                         height: 10.0,

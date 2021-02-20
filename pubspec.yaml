@@ -11,7 +11,7 @@ description: A new Flutter application.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+6
+version: 1.0.0+10
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -73,21 +73,21 @@ dependencies:
   firebase_core: ^0.5.3
   flutter_webview_plugin: ^0.3.11
   new_version: ^0.0.5
-
-
-
+  intro_slider: ^2.3.3
+  after_layout: ^1.0.7+2
+  translator: ^0.1.5
+  loading_button: ^0.0.3+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.7.4
-  
 
 flutter_icons:
-#  image_path_android: "assets/images/icon.png"
+  #  image_path_android: "assets/images/icon.png"
   android: true
   ios: true
-  image_path: 'assets/images/icon.png'
+  image_path: "assets/images/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -136,6 +136,10 @@ flutter:
     - assets/images/food_ic_walk3.svg
     - assets/images/paytm.jpg
     - assets/images/paymentlogo.jpg
+    - assets/images/intro1.png
+    - assets/images/intro2.png
+    - assets/images/intro3.png
+    - assets/images/click.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -180,7 +184,6 @@ flutter:
     - family: MyFlutterApp
       fonts:
         - asset: fonts/MyFlutterApp.ttf
-
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

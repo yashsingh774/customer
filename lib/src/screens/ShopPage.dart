@@ -1,19 +1,24 @@
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodexpress/config/api.dart';
 import 'package:foodexpress/models/cartmodel.dart';
+import 'package:foodexpress/models/event_model.dart';
 import 'package:foodexpress/providers/auth.dart';
+import 'package:foodexpress/src/Widget/CircularLoadingWidget.dart';
+import 'package:foodexpress/src/Widget/LoadingWidget.dart';
+import 'package:foodexpress/src/Widget/TextLoadingWidget.dart';
 import 'package:foodexpress/src/screens/Category.dart';
 import 'package:foodexpress/src/utils/CustomTextStyle.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:progressive_image/progressive_image.dart';
+
+import 'Section.dart';
 
 void main() => runApp(MyApp());
 
@@ -324,287 +329,353 @@ class _ShopPageState extends State<ShopPage> {
     return Scaffold(
         backgroundColor: Color(000),
         body: SafeArea(
-            child: RefreshIndicator(
-                key: refreshKey,
-                onRefresh: () async {
-                  await refreshList(_selectedArea);
-                },
-                child: new LayoutBuilder(builder:
-                    (BuildContext context, BoxConstraints constraints) {
-                  return SingleChildScrollView(
-                      child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(left: 2.0, right: 2.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.grey.shade300, width: 1),
-                              color: Colors.white70,
-                              borderRadius: BorderRadius.only(
-                                bottomRight: Radius.circular(20.0),
-                                bottomLeft: Radius.circular(20.0),
-                                topLeft: Radius.circular(20.0),
-                                topRight: Radius.circular(20.0),
-                              )),
-                          child: TextField(
-                            textInputAction: TextInputAction.search,
-                            onSubmitted: (value) {
-                              SerchShop(
-                                  value != null ? value : null,
-                                  _currentPosition != null
-                                      ? _currentPosition.latitude
-                                      : '',
-                                  _currentPosition != null
-                                      ? _currentPosition.longitude
-                                      : '');
-                            },
-                            controller: editingController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(top: 14.0),
-                              hintText: 'Search for shops',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'Montserrat', fontSize: 14.0),
-                              prefixIcon:
-                                  Icon(Icons.search, color: Colors.grey),
-                            ),
-                          ),
-                        ),
-                      ),
-                      buildBannerCard
-                          ? Container(
-                              padding: EdgeInsets.only(
-                                  top: 2.0, left: 2.0, right: 2.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white70,
-                                    borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(20.0),
-                                      bottomLeft: Radius.circular(20.0),
-                                      topLeft: Radius.circular(20.0),
-                                      topRight: Radius.circular(20.0),
-                                    )),
-                              ),
-                            )
-                          : SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: 220,
-                              child: Shimmer.fromColors(
-                                child: Card(
-                                  color: Colors.grey,
+            child: _sections.isEmpty && _banners.isEmpty && _shops.isEmpty
+                ? LoadingWidget(height: 500)
+                : RefreshIndicator(
+                    key: refreshKey,
+                    onRefresh: () async {
+                      await refreshList(_selectedArea);
+                    },
+                    child: new LayoutBuilder(builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return SingleChildScrollView(
+                          child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(
+                                left: 25.0, right: 25.0, top: 15, bottom: 15),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1),
+                                  color: Colors.white70,
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(10.0),
+                                    bottomLeft: Radius.circular(10.0),
+                                    topLeft: Radius.circular(10.0),
+                                    topRight: Radius.circular(10.0),
+                                  )),
+                              child: TextField(
+                                textInputAction: TextInputAction.search,
+                                onSubmitted: (value) {
+                                  SerchShop(
+                                      value != null ? value : null,
+                                      _currentPosition != null
+                                          ? _currentPosition.latitude
+                                          : '',
+                                      _currentPosition != null
+                                          ? _currentPosition.longitude
+                                          : '');
+                                },
+                                controller: editingController,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(top: 14.0),
+                                  hintText: 'Search for shops',
+                                  hintStyle: TextStyle(
+                                      fontFamily: 'Montserrat', fontSize: 14.0),
+                                  prefixIcon:
+                                      Icon(Icons.search, color: Colors.grey),
                                 ),
-                                baseColor: Colors.white70,
-                                highlightColor: Colors.grey[500],
-                                direction: ShimmerDirection.ltr,
                               ),
                             ),
-                      Container(
-                        height: 220,
-                        padding:
-                            EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: _banners.map((banner) {
-                              return _buildBannerCard(banner['name'],
-                                  banner['image'], banner['id']);
-                            }).toList(),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                          // height: 150.0,
-                          // width: 300.0,
-                          child: Padding(
-                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.star,
-                              color: Colors.black,
+                          SizedBox(
+                              // height: 150.0,
+                              // width: 300.0,
+                              child: Padding(
+                            padding: EdgeInsets.only(
+                                left: 15.0, right: 15.0, top: 15),
+                            child: Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.star,
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  'Shop Categories',
+                                  style: CustomTextStyle.textFormFieldBold
+                                      .copyWith(color: Colors.black),
+                                ),
+                              ],
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              'Shop Categories',
-                              style: CustomTextStyle.textFormFieldBold
-                                  .copyWith(color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      )),
-                      buildSectionCard
-                          ? Container(
-                              height: 140,
+                          )),
+                          Padding(
                               padding: EdgeInsets.only(
-                                  top: 10.0, left: 10.0, right: 10.0),
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
+                                  top: 10.0,
+                                  left: 20.0,
+                                  right: 20.0,
+                                  bottom: 10.0),
+                              child: new GridView.count(
+                                crossAxisCount: 3,
+                                shrinkWrap: true,
+                                primary: true,
+                                scrollDirection: Axis.vertical,
                                 children: _sections.map((section) {
                                   return _buildSectionCard(section['name'],
                                       section['image'], section['id']);
                                 }).toList(),
-                              ),
-                            )
-                          : SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: 140,
-                              child: Shimmer.fromColors(
-                                child: Card(
-                                  color: Colors.grey,
-                                ),
-                                baseColor: Colors.white70,
-                                highlightColor: Colors.grey[500],
-                                direction: ShimmerDirection.ltr,
+                              )),
+                          Container(
+                            padding: EdgeInsets.only(left: 2.0, right: 2.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white70,
+                                  borderRadius: BorderRadius.only(
+                                    bottomRight: Radius.circular(20.0),
+                                    bottomLeft: Radius.circular(20.0),
+                                    topLeft: Radius.circular(20.0),
+                                    topRight: Radius.circular(20.0),
+                                  )),
+                            ),
+                          ),
+                          Container(
+                            height: 220,
+                            padding: EdgeInsets.only(
+                                top: 10.0, left: 10.0, right: 10.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: _banners.map((banner) {
+                                  return _buildBannerCard(banner['name'],
+                                      banner['image'], banner['id']);
+                                }).toList(),
                               ),
                             ),
-                      Container(
-                          padding: EdgeInsets.only(
-                              top: 20.0, left: 10.0, right: 20.0),
-                          height: 800,
-                          child: new GridView.count(
-                            crossAxisCount: 3,
-                            shrinkWrap: false,
-                            primary: false,
-                            scrollDirection: Axis.vertical,
-                            children: _shops.map((shop) {
-                              return _buildCard(shop['name'], shop['image'],
-                                  shop['address'], shop['id']);
-                            }).toList(),
-                          )),
-                    ],
-                  ));
-                }))));
+                          ),
+                          _shops.isEmpty
+                              ? TextLoadingWidget(height: 50)
+                              : SizedBox(
+                                  // height: 150.0,
+                                  // width: 300.0,
+                                  child: Padding(
+                                  padding:
+                                      EdgeInsets.only(left: 15.0, right: 15.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.star,
+                                        color: Colors.black,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        'Shops',
+                                        style: CustomTextStyle.textFormFieldBold
+                                            .copyWith(color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          Container(
+                              padding: EdgeInsets.only(
+                                  top: 20.0, left: 10.0, right: 20.0),
+                              height: 400,
+                              child: new GridView.count(
+                                crossAxisCount: 3,
+                                shrinkWrap: false,
+                                primary: false,
+                                scrollDirection: Axis.vertical,
+                                children: _shops.map((shop) {
+                                  return _buildCard(shop['name'], shop['image'],
+                                      shop['address'], shop['id']);
+                                }).toList(),
+                              )),
+                        ],
+                      ));
+                    }))));
   }
 
-  Widget _buildSectionCard(String name, String imgPath, int sectionpID) {
+  Widget _buildSectionCard(String name, String imgPath, int sectionID) {
     return InkWell(
-      highlightColor: Colors.grey,
-      splashColor: Colors.grey,
-      onTap: () {
-        getShopsByCategory(
-            '$sectionpID',
-            _currentPosition != null ? _currentPosition.latitude : '',
-            _currentPosition != null ? _currentPosition.longitude : '');
-      },
-      child: Container(
-        margin: EdgeInsets.all(5),
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.grey.shade300, width: 2),
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Container(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(80),
-                // child: Image.network(
-                //   imgPath,
-                //   fit: BoxFit.contain,
-                //   height: 50,
-                //   width: 90,
-                // ),
-                child: ProgressiveImage(
-                  //imgPath,
-                  placeholder: AssetImage('assets/placeholder.jpg'),
-                  // size: 1.87KB
-                  thumbnail: NetworkImage(imgPath),
-                  // size: 1.29MB
-                  image: NetworkImage(imgPath),
-                  fit: BoxFit.contain,
-                  height: 50,
-                  width: 90,
+        highlightColor: Colors.greenAccent,
+        splashColor: Colors.greenAccent,
+        onTap: () {
+          getShopsByCategory(
+              '$sectionID',
+              _currentPosition != null ? _currentPosition.latitude : '',
+              _currentPosition != null ? _currentPosition.longitude : '');
+          // Navigator.of(context).push(MaterialPageRoute(
+          //   builder: (context) => SectionCard(
+          //       getShopsByCategory: '$sectionID', sectionID: '$sectionID'),
+          // ));
+        },
+        child: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              boxShadow: [
+                BoxShadow(
+                    color: Theme.of(context).focusColor.withOpacity(0.2),
+                    offset: Offset(0, 2),
+                    blurRadius: 7.0)
+              ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Hero(
+                tag: sectionID,
+                child: Container(
+                  margin: EdgeInsetsDirectional.only(),
+                  width: 80,
+                  height: 80,
+                  // decoration: BoxDecoration(
+                  //     color: Colors.white,
+                  //     borderRadius: BorderRadius.all(Radius.circular(5)),
+                  //     boxShadow: [
+                  //       BoxShadow(
+                  //           color:
+                  //               Theme.of(context).focusColor.withOpacity(0.2),
+                  //           offset: Offset(0, 2),
+                  //           blurRadius: 7.0)
+                  //     ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(0),
+                    child: Image.network(
+                      imgPath,
+                      fit: BoxFit.contain,
+                      height: 80,
+                      width: 80,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            Text(
-              name != null ? name : '',
-              style: TextStyle(
-                  color: Colors.black, fontFamily: 'Varela', fontSize: 15.0),
-              softWrap: false,
-              maxLines: 3,
-              overflow: TextOverflow.fade,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 4),
-          ],
-        ),
-      ),
-    );
+              SizedBox(height: 5),
+              Container(
+                child: Text(
+                  name != null ? name : '',
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 
   Widget _buildCard(String name, String imgPath, String address, int shopID) {
     return InkWell(
-      highlightColor: Colors.grey,
-      splashColor: Colors.grey,
-      onTap: () {
-        // Navigator.of(context).push(MaterialPageRoute(
-        //   builder: (context) => Category(shopID: '$shopID', shopName: name),
-        // ));
-        Navigator.push(
-            context,
-            PageTransition(
-                type: PageTransitionType.rightToLeft,
-                child: Category(shopID: '$shopID', shopName: name)));
-      },
-      child: Container(
-        margin: EdgeInsets.all(5),
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.grey.shade300, width: 2),
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Container(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(1),
-                // child: Image.network(
-                //   imgPath,
-                //   fit: BoxFit.contain,
-                //   height: 60,
-                //   width: 80,
-                // ),
-
-                child: ProgressiveImage(
-                  //imgPath,
-                  placeholder: AssetImage('assets/placeholder.jpg'),
-                  // size: 1.87KB
-                  thumbnail: NetworkImage(imgPath),
-                  // size: 1.29MB
-                  image: NetworkImage(imgPath),
-                  fit: BoxFit.contain,
-                  height: 60,
+        highlightColor: Colors.greenAccent,
+        splashColor: Colors.greenAccent,
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => Category(shopID: '$shopID', shopName: name),
+          ));
+        },
+        child: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              boxShadow: [
+                BoxShadow(
+                    color: Theme.of(context).focusColor.withOpacity(0.2),
+                    offset: Offset(0, 2),
+                    blurRadius: 7.0)
+              ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Hero(
+                tag: shopID,
+                child: Container(
+                  margin: EdgeInsetsDirectional.only(),
                   width: 80,
+                  height: 80,
+                  // decoration: BoxDecoration(
+                  //     color: Colors.white,
+                  //     borderRadius: BorderRadius.all(Radius.circular(5)),
+                  //     boxShadow: [
+                  //       BoxShadow(
+                  //           color:
+                  //               Theme.of(context).focusColor.withOpacity(0.2),
+                  //           offset: Offset(0, 2),
+                  //           blurRadius: 7.0)
+                  //     ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(0),
+                    child: Image.network(
+                      imgPath,
+                      fit: BoxFit.contain,
+                      height: 80,
+                      width: 80,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            Text(
-              name != null ? name : '',
-              style: TextStyle(
-                  color: Colors.black, fontFamily: 'Varela', fontSize: 15.0),
-              softWrap: false,
-              maxLines: 3,
-              overflow: TextOverflow.fade,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+              SizedBox(height: 5),
+              Container(
+                child: Text(
+                  name != null ? name : '',
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+              ),
+            ],
+          ),
+        ));
   }
+
+//  Widget _buildCard(String name, String imgPath, String address, int shopID) {
+//     return InkWell(
+//       highlightColor: Colors.transparent,
+//       splashColor: Colors.white,
+//       onTap: () {
+//         Navigator.of(context).push(MaterialPageRoute(
+//           builder: (context) => Category(shopID: '$shopID', shopName: name),
+//         ));
+//       },
+//       child: Container(
+//         margin: EdgeInsets.all(5),
+//         padding: EdgeInsets.all(15),
+//           decoration: BoxDecoration(
+//             color: Colors.white,
+//            border: Border.all(color: Colors.grey.shade300, width: 2),
+//               borderRadius: BorderRadius.all(Radius.circular(5)),
+//               ),
+//         child: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+//           children: <Widget>[
+//             Container(
+//               child: ClipRRect(
+//                 borderRadius: BorderRadius.circular(50),
+//                 child: Image.network(
+//                   imgPath,
+//                   fit: BoxFit.contain,
+//                   height: 80,
+//                  width: 60,
+//                 ),
+//               ),
+//             ),
+//             Text(
+//               name != null ? name : '',
+//               style: TextStyle(
+//                   color: Colors.black,
+//                   fontFamily: 'Varela',
+//                   fontSize: 15.0),
+//               softWrap: false,
+//               maxLines: 3,
+//               overflow: TextOverflow.fade,
+//               textAlign: TextAlign.center,
+//             ),
+
+//           ],
+//         ),
+//       )
+//     );
+// }
+// }
 
   Widget _buildBannerCard(String name, String imgPath, int bannerpID) {
     return InkWell(
@@ -612,28 +683,18 @@ class _ShopPageState extends State<ShopPage> {
       splashColor: Colors.white,
       child: Container(
         margin: EdgeInsets.all(5),
-        padding: EdgeInsets.all(0),
+        padding: EdgeInsets.all(4),
         alignment: Alignment.topLeft,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300, width: 2),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: ProgressiveImage(
-                //imgPath,
-                placeholder: AssetImage('assets/placeholder.jpg'),
-                // size: 1.87KB
-                thumbnail: NetworkImage('https://i.imgur.com/7XL923M.jpg'),
-                // size: 1.29MB
-                image: NetworkImage(imgPath),
+              child: Image.network(
+                imgPath,
                 fit: BoxFit.fitWidth,
                 height: 180,
-                width: 430,
+                width: 400,
               ),
             ),
           ],

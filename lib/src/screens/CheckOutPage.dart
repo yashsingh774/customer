@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:foodexpress/config/api.dart';
 import 'package:foodexpress/main.dart';
 import 'package:foodexpress/providers/auth.dart';
+import 'package:foodexpress/src/screens/ProductPage.dart';
+import 'package:foodexpress/src/screens/cartpage.dart';
 import 'package:foodexpress/src/screens/paymentType.dart';
 import 'package:foodexpress/src/shared/Product.dart';
 import 'package:foodexpress/src/utils/CustomTextStyle.dart';
@@ -111,6 +113,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
         _OrderId = resBody['data']['id'].toString();
         _OrderAmount = resBody['data']['total'].toString();
         //       showThankYouBottomSheet(context,resBody['message'],resBody['data']['id'].toString(),resBody['data']['total'].toString());
+        if (resBody['data']['total'] <= 100){
+          _showAlert1();
+
+        }
+        
+        else{
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -119,12 +127,41 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       orderID: _OrderId,
                     )));
         ScopedModel.of<CartModel>(context, rebuildOnChange: true).clearCart();
+        }
+
       });
     } else {
       _showAlert(context);
       throw Exception('Failed to data');
     }
     return "Sucess";
+  }
+
+
+ Future<void> _showAlert1() {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Invalid Amount'),
+          content: Text('Minimum Order is valid on more than 100 Rs'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+                onPressed: () {
+                  //  Navigator.of(context).pop(true);
+                    // ScopedModel.of<CartModel>(context, rebuildOnChange: true)
+                    //     .clearCart();
+                  //  Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CartPage(),
+                    ));
+                  },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _showAlert(BuildContext context) {
@@ -296,6 +333,20 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                 style: CustomTextStyle.textFormFieldMedium
                                     .copyWith(
                                         color: Colors.blueGrey,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600)),
+                          ),
+                          SizedBox(height: 15),
+                        ],
+                      ),
+                        Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                                'NOTE:- Due To Bulk Order We Deliver Your Order in 12 Hours',
+                                style: CustomTextStyle.textFormFieldMedium
+                                    .copyWith(
+                                        color: Colors.red,
                                         fontSize: 10,
                                         fontWeight: FontWeight.w600)),
                           ),
@@ -778,3 +829,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 }
+
+
+
+
+
+
+
+
+

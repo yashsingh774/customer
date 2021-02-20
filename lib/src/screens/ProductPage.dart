@@ -126,6 +126,8 @@ class _ProductPageState extends State<ProductPage> {
         ProductShow['stock_count'] = resBody['data']['stock_count'];
         ProductShow['in_stock'] = resBody['data']['in_stock'];
         ProductShow['description'] = resBody['data']['description'];
+        ProductShow['min_order_value'] = resBody['data']['shop']['min_order_value'];
+        
         _listImage = resBody['data']['image'];
         _variations = resBody['data']['variations'];
         _options = resBody['data']['options'];
@@ -214,7 +216,7 @@ Future<bool> _showalert(){
     //     ),
     //   );
     // }
-
+  
     void _showToastStock(BuildContext context) {
       final scaffold = Scaffold.of(context);
       scaffold.showSnackBar(
